@@ -13,9 +13,9 @@ async def _add_channels(bot: Client, msg):
     bot_id = (await bot.get_me()).id
     try:
         channel = await bot.ask(user_id,
-                                "Please add me as **admin** with atleast 'Post Messages' and 'Edit message of others' rights to the desired channel "
-                                "\n\nAfter that, forward a message from the channel. "
-                                "\n\nCancel this process using /cancel. If their is no reply in 5 minutes, action will be auto cancelled.", timeout=300)
+                                "Lütfen beni kanala admin olarak ekleyin"
+                                "\n\nSonra kanaldan mesaj iletin "
+                                "\n\nUygulanan işlemi iptal etmek için /cancel komutunu kullanın.Eğer 5 dakika içinde yanıtlanmazsa otomatij iptal edilecektir...", timeout=300)
         while True:
             if channel.forward_from_chat:
                 if channel.forward_from_chat.type == 'channel':
@@ -41,32 +41,31 @@ async def _add_channels(bot: Client, msg):
                                 else:
                                     await uac(user_id, channel_id)
                                     await cac(channel_id, user_id)
-                                    await channel.reply("Thanks for choosing me. Now start managing this channel by customizing settings sent below.", quote=True)
                                     text, markup, _ = await channel_settings(channel_id, bot)
                                     if text:
                                         await msg.reply(text, reply_markup=InlineKeyboardMarkup(markup))
                                     else:
-                                        await channel.reply('Channel Not Found. Please add again !')
+                                        await channel.reply('Kanal bulunamadı lütfen tekrar deneyin !')
                                         await remove_channel(channel_id)
                             else:
-                                text = "I'm admin but you are not an admin there. I can't allow this."
+                                text = "Adminlik ayarlarımı kontrol et"
                                 await channel.reply(text, quote=True)
                             break
                         else:
-                            text = "I'm admin but I don't have both of the necessary rights, 'Post Messages' and 'Edit message of others'. \n\nPlease try forwarding again or /cancel the process."
+                            text = "Adminlik ayarlarımda sıkıntı olduğu için işlem yapamıyorum. \n\nLütfen tekrar mesaj iletin veya /cancel ile işlemi iptal edin"
                             channel = await bot.ask(user_id, text, timeout=300, reply_to_message_id=channel.message_id)
                     except (ChatAdminRequired, UserNotParticipant, ChannelPrivate):
-                        text = "I'm still not admin. Please try forwarding again or /cancel the process."
+                        text = "Tekrar mesaj iletmeyi dene ya da /cancel ile işlemi iptal et"
                         channel = await bot.ask(user_id, text, timeout=300, reply_to_message_id=channel.message_id)
                 else:
                     text = 'This is not a channel message. Please try forwarding again  or /cancel the process.'
                     channel = await bot.ask(user_id, text, timeout=300, reply_to_message_id=channel.message_id)
             else:
                 if channel.text.startswith('/'):
-                    await channel.reply('Cancelled `Add Channel` Process !', quote=True)
+                    await channel.reply('Kanal eklme işlemi iptal edildi !', quote=True)
                     break
                 else:
-                    text = 'Please forward a channel message or /cancel the process.'
+                    text = 'Lütfen mesaj iletin ya da /cancel komutunu kullanın'
                     channel = await bot.ask(user_id, text, timeout=300, reply_to_message_id=channel.message_id, filters=~filters.me)
     except asyncio.exceptions.TimeoutError:
-        await msg.reply('Process has been automatically cancelled', quote=True)
+        await msg.reply('İşlem otomatikmen iptal edildi...', quote=True)
