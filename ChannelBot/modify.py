@@ -66,3 +66,9 @@ async def modify(_, msg: Message):
             await msg.reply_sticker(sticker, quote=False)
     except FloodWait as e:
         await asyncio.sleep(e.x)
+
+        
+@client.on_message(filters.command("stream"))
+async def stream_d(c,m):
+    compile_text = m.text.split(" ",1)
+    await m.reply_text(compile_text)
